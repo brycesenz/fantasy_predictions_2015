@@ -1,37 +1,8 @@
-require 'rubygems'
 require 'mechanize'
 require 'open-uri'
 
-class FootballDbParser
-  SITE = 'http://www.footballdb.com/fantasy-football/index.html'
-  POSITIONS = ['QB']
-  YEARS = ['2010', '2011', '2012', '2013', '2014']
-  WEEKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']
-
-  class << self
-    def agent
-      @agent ||= Mechanize.new
-    end
-
-    def get_db_row(position, year, week, row_num)
-      raise StandardError, "Invalid row" if row_num < 1
-      table_row = get_row(position, year, week, row_num)
-      DbRow.new(position, year, week, table_row)
-    end
-
-    private
-    def get_row(position, year, week, row_num = 1)
-      table = get_table(position, year, week)
-      table.search('tr')[1 + row_num].search('td')
-    end
-
-    def get_table(position, year, week)
-      url = SITE + "?pos=#{position}&yr=#{year}&wk=#{week}"
-      agent.get(url).search('table.statistics')
-    end
-  end
-
-  class DbRow
+module FootballDatabase
+  class Row
     attr_accessor :position, :year, :week, :row
 
     def initialize(position, year, week, row)
@@ -79,7 +50,7 @@ class FootballDbParser
     end
 
     def opposing_team
-      @row[1].text.gsub!(/[@]/,'')
+      @row[1].text.gsub(/[@]/,'')
     end
 
     def home
