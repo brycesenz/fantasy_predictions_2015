@@ -4,39 +4,11 @@ require 'open-uri'
 module FootballDatabase
   class Parser
     SITE = 'http://www.footballdb.com/fantasy-football/index.html'
-    POSITIONS = ['QB', 'RB', 'WR', 'TE', 'K', 'DST']
-    YEARS = ['2010', '2011', '2012', '2013', '2014']
-    WEEKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']
 
     class << self
       def agent
         @agent ||= Mechanize.new
       end
-
-      def get_all_positions
-        array = []
-        POSITIONS.each do |position|
-          array << get_all_years(position)
-        end
-        array.flatten
-      end
-
-      def get_all_years(position)
-        array = []
-        YEARS.each do |year|
-          array << get_all_weeks(position, year)
-        end
-        array.flatten
-      end
-
-      def get_all_weeks(position, year)
-        array = []
-        WEEKS.each do |week|
-          array << get_all_rows(position, year, week)
-        end
-        array.flatten
-      end
-
 
       def get_all_rows(position, year, week)
         table = get_table(position, year, week)
