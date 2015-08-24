@@ -2,13 +2,18 @@ require_relative 'data_builder'
 
 class BuildPreseasonData < DataBuilder
   class << self
-    DATAFIELDS = [ :datapoints, :points, :passing_attempts, 
-      :passing_completions, :passing_yards, :passing_touchdowns, 
-      :passing_interceptions, :passing_two_points,
+    DATAFIELDS = [ :datapoints, :points, :preseason_rank, 
+      :passing_attempts, :passing_completions, :passing_yards, 
+      :passing_touchdowns, :passing_interceptions, :passing_two_points,
       :rushing_attempts, :rushing_yards, :rushing_touchdowns, 
       :rushing_two_points, :receiving_receptions, :receiving_yards,
       :receiving_touchdowns, :receiving_two_points, 
-      :fumble_fumbles, :fumble_touchdowns ]
+      :fumble_fumbles, :fumble_touchdowns,
+      :pat_attempts, :pat_made, :fg_attempts, :fg_made, :fifty_yd_fg_made,
+      :defensive_sacks, :defensive_interceptions, :defensive_safeties,
+      :defensive_fumble_recoveries, :defensive_blocked_kicks, :defensive_touchdowns,
+      :defensive_points_against, :defensive_passing_yards_allowed, 
+      :defensive_rushing_yards_allowed, :defensive_total_yards_allowed ]
 
     def run(position = 'QB')
       players = Player.where(position: position)
@@ -19,7 +24,7 @@ class BuildPreseasonData < DataBuilder
           dataset << build_row(player, year)
         end
       end
-      filename = position.downcase + '_preseason_data'
+      filename = "preseason/#{position.downcase}_preseason_data"
       save_to_file(filename, dataset)
     end
 

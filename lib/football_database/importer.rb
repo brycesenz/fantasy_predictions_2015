@@ -4,8 +4,8 @@ require 'open-uri'
 module FootballDatabase
   class Importer
     POSITIONS = ['QB', 'RB', 'WR', 'TE', 'K', 'DST']
-    YEARS = ['2010', '2011', '2012', '2013', '2014']
-    WEEKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17']
+    YEARS = [2010, 2011, 2012, 2013, 2014]
+    WEEKS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 
     class << self
       def import

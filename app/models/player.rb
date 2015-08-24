@@ -28,6 +28,14 @@ class Player < ActiveRecord::Base
     end
   end
 
+  # TODO: Scopes don't work for some reason...
+  # scope :quarterback,     where('position = ?', 'QB')
+  # scope :running_back,    where('position = ?', 'RB')
+  # scope :wide_receiver,   where('position = ?', 'WR')
+  # scope :tight_end,       where('position = ?', 'TE')
+  # scope :kicker,          where('position = ?', 'K')
+  # scope :defense,         where('position = ?', 'DST')
+
   # SAVING DATA
   def find_or_build_performance(year, week)
     performance = performances.find(:first, conditions: { year: year.to_i, week: week.to_i })
@@ -45,12 +53,21 @@ class Player < ActiveRecord::Base
     aggregate_data(year).count
   end
 
+  def preseason_rank_in(year)
+    send("preseason_rank_#{year.to_s}")
+  end
+
   PERF_METRICS = [ :points, :passing_attempts, :passing_completions, :passing_yards, 
     :passing_touchdowns, :passing_interceptions, :passing_two_points,
     :rushing_attempts, :rushing_yards, :rushing_touchdowns, 
     :rushing_two_points, :receiving_receptions, :receiving_yards,
     :receiving_touchdowns, :receiving_two_points, 
-    :fumble_fumbles, :fumble_touchdowns ]
+    :fumble_fumbles, :fumble_touchdowns, 
+    :pat_attempts, :pat_made, :fg_attempts, :fg_made, :fifty_yd_fg_made,
+    :defensive_sacks, :defensive_interceptions, :defensive_safeties,
+    :defensive_fumble_recoveries, :defensive_blocked_kicks, :defensive_touchdowns,
+    :defensive_points_against, :defensive_passing_yards_allowed, 
+    :defensive_rushing_yards_allowed, :defensive_total_yards_allowed ]
 
   PERF_METRICS.each do |metric|
     define_method "#{metric}_in" do |year|
@@ -65,6 +82,7 @@ class Player < ActiveRecord::Base
 
   def map_reduce_data(year, fieldname)
     arr = aggregate_data(year).map(&fieldname.to_sym)
+    arr = arr.grep(Integer) #Remove nil entries
     if arr.empty? 
       nil
     else 

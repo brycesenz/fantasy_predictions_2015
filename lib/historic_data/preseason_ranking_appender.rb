@@ -9,15 +9,13 @@ require 'fuzzy_match'
 
 module HistoricData
   class PreseasonRankingAppender
-    # YEARS = ['2010', '2011', '2012', '2013', '2014']
-    YEARS = ['2010']
+    YEARS = ['2010', '2011', '2012', '2013', '2014']
 
     class << self
       def append
         YEARS.each do |year|
           data = read_dataset(year)
-          # puts "data = #{data.inspect}"
-          Player.first(1).each do |player|
+          Player.all.each do |player|
             append_player_data(data, player, year)
           end
         end
@@ -30,7 +28,7 @@ module HistoricData
       end
 
       def append_player_data(data, player, year)
-        ranking = find_fuzzy_row(data, player)
+        ranking = get_ranking(data, player)
         if ranking.nil?
           puts "#{year} data for #{player.name} not found!"
         else
@@ -38,12 +36,19 @@ module HistoricData
         end
       end
 
-      def find_fuzzy_ranking(data, player)
+      def get_ranking(data, player)
+        player_array = find_player_array(data, player)
+        player_array.nil? ? nil : player_array[1].to_i
+      end
+
+      def find_player_array(data, player)
         data_names = data.map { |d| d[0] }
-        match = FuzzyMatch.new(data_names).find(player.name)
-        ranking_array = data.select { |d| d[0] == match }
-        # puts "ranking_array = #{ranking_array}"
-        ranking_array.present? ? ranking_array[1].to_i : nil
+        found_name = FuzzyMatch.new(data_names).find(player.name)
+        if found_name.present?
+          data.select { |d| d[0] == found_name }.first
+        else
+          nil
+        end
       end
     end
   end
